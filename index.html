@@ -9,45 +9,177 @@
 <body>
     <div class="container">
         <header>
-            <h1>⚡ Calorie Tracker</h1>
-            <p class="subtitle">Track your daily calorie intake</p>
+            <h1>Calorie Budget</h1>
+            <div class="budget-amount" id="budget-display">1,900</div>
         </header>
 
-        <div class="goal-section">
-            <label for="calorie-goal">Daily Calorie Goal:</label>
-            <input type="number" id="calorie-goal" placeholder="2000" min="0">
-            <button id="set-goal-btn">Set Goal</button>
+        <div class="main-grid">
+            <!-- Left Column -->
+            <div class="left-column">
+                <div class="metric-card">
+                    <div class="metric-label">Exercise</div>
+                    <div class="metric-value" id="exercise-value">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Steps</div>
+                    <div class="metric-value" id="steps-value">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Water</div>
+                    <div class="metric-value" id="water-value">0</div>
+                </div>
+                <div class="metric-card notes-card">
+                    <div class="metric-label">Notes</div>
+                    <div class="notes-icon">📝</div>
+                </div>
+            </div>
+
+            <!-- Center - Apple Progress Ring -->
+            <div class="center-column">
+                <div class="apple-container">
+                    <svg class="apple-progress" viewBox="0 0 200 200">
+                        <!-- Background circle (apple shape) -->
+                        <circle cx="100" cy="100" r="80" fill="none" stroke="#E8E8E8" stroke-width="12"/>
+                        <!-- Progress circle -->
+                        <circle id="progress-ring" cx="100" cy="100" r="80" fill="none" 
+                                stroke="#4CD964" stroke-width="12" 
+                                stroke-linecap="round"
+                                transform="rotate(-90 100 100)"
+                                stroke-dasharray="502.4"
+                                stroke-dashoffset="502.4"/>
+                        <!-- Stem indicator -->
+                        <path d="M 100 15 Q 105 18 100 25" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                    <div class="apple-center">
+                        <div class="calories-consumed" id="calories-consumed">0</div>
+                        <div class="calories-left-label">Left</div>
+                        <div class="calories-left" id="calories-left">1,900</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <div class="metric-card meal-card">
+                    <div class="metric-label">Breakfast</div>
+                    <div class="metric-value" id="breakfast-value">0</div>
+                </div>
+                <div class="metric-card meal-card">
+                    <div class="metric-label">Lunch</div>
+                    <div class="metric-value" id="lunch-value">0</div>
+                </div>
+                <div class="metric-card meal-card">
+                    <div class="metric-label">Dinner</div>
+                    <div class="metric-value" id="dinner-value">0</div>
+                </div>
+                <div class="metric-card meal-card">
+                    <div class="metric-label">Snacks</div>
+                    <div class="metric-value" id="snacks-value">0</div>
+                </div>
+            </div>
         </div>
 
-        <div class="progress-section">
-            <div class="progress-info">
-                <span class="calories-consumed">0</span> / <span class="calories-goal">2000</span> cal
+        <!-- Quick Add Section -->
+        <div class="quick-add-section">
+            <button class="quick-add-btn" onclick="openAddModal()">+ Add Food</button>
+            <button class="quick-add-btn secondary" onclick="openQuickMetrics()">⚡ Quick Add</button>
+        </div>
+
+        <!-- Weekly Chart -->
+        <div class="weekly-chart-section">
+            <h2>Weekly Progress</h2>
+            <div class="chart-container">
+                <div class="threshold-line"></div>
+                <div class="bars-container" id="weekly-bars"></div>
             </div>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-            </div>
-            <div class="calories-remaining">
-                <span id="remaining">2000</span> calories remaining
+            <div class="chart-days">
+                <span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
             </div>
         </div>
 
-        <div class="add-food-section">
-            <h2>Add Food Item</h2>
-            <div class="input-group">
-                <input type="text" id="food-name" placeholder="Food name">
-                <input type="number" id="food-calories" placeholder="Calories" min="0">
-                <button id="add-food-btn">Add</button>
+        <!-- Analysis Section -->
+        <div class="analysis-section">
+            <span class="analysis-icon">🎯</span>
+            <span class="analysis-text">My Analysis: <span class="analysis-status" id="analysis-status">On Target</span></span>
+        </div>
+
+        <!-- Recipe Section -->
+        <div class="recipe-section">
+            <div class="recipe-card">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400" alt="Healthy Recipe" class="recipe-image">
+                <div class="recipe-content">
+                    <h3>FAST & EASY</h3>
+                    <p>RECIPES</p>
+                </div>
             </div>
         </div>
 
-        <div class="food-list-section">
-            <h2>Today's Food Log</h2>
-            <ul id="food-list"></ul>
-            <button id="clear-all-btn" class="clear-btn">Clear All</button>
+        <!-- Settings Section -->
+        <div class="settings-section">
+            <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+            <button class="settings-btn" onclick="resetDay()">🔄 Reset Today</button>
+        </div>
+    </div>
+
+    <!-- Add Food Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddModal()">&times;</span>
+            <h2>Add Food</h2>
+            <div class="modal-form">
+                <label>Meal Type</label>
+                <select id="meal-type">
+                    <option value="breakfast">Breakfast</option>
+                    <option value="lunch">Lunch</option>
+                    <option value="dinner">Dinner</option>
+                    <option value="snacks">Snacks</option>
+                </select>
+                
+                <label>Food Name</label>
+                <input type="text" id="food-name" placeholder="e.g., Chicken Salad">
+                
+                <label>Calories</label>
+                <input type="number" id="food-calories" placeholder="e.g., 350">
+                
+                <button class="modal-btn" onclick="addFood()">Add</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Metrics Modal -->
+    <div id="metricsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeQuickMetrics()">&times;</span>
+            <h2>Quick Metrics</h2>
+            <div class="modal-form">
+                <label>Exercise (calories burned)</label>
+                <input type="number" id="exercise-input" placeholder="e.g., 350">
+                
+                <label>Steps</label>
+                <input type="number" id="steps-input" placeholder="e.g., 8000">
+                
+                <label>Water (glasses)</label>
+                <input type="number" id="water-input" placeholder="e.g., 8">
+                
+                <button class="modal-btn" onclick="updateMetrics()">Update</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSettings()">&times;</span>
+            <h2>Settings</h2>
+            <div class="modal-form">
+                <label>Daily Calorie Goal</label>
+                <input type="number" id="calorie-goal-input" placeholder="e.g., 2000">
+                
+                <button class="modal-btn" onclick="updateGoal()">Save Goal</button>
+            </div>
         </div>
     </div>
 
     <script src="app.js"></script>
 </body>
 </html>
-

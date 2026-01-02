@@ -1,156 +1,296 @@
 // State management
-let calorieGoal = 2000;
+let calorieGoal = 1900;
+let totalCalories = 0;
+let exerciseCalories = 0;
+let steps = 0;
+let water = 0;
+
+let mealData = {
+    breakfast: 0,
+    lunch: 0,
+    dinner: 0,
+    snacks: 0
+};
+
 let foodItems = [];
 
-// DOM elements
-const calorieGoalInput = document.getElementById('calorie-goal');
-const setGoalBtn = document.getElementById('set-goal-btn');
-const foodNameInput = document.getElementById('food-name');
-const foodCaloriesInput = document.getElementById('food-calories');
-const addFoodBtn = document.getElementById('add-food-btn');
-const foodList = document.getElementById('food-list');
-const clearAllBtn = document.getElementById('clear-all-btn');
-const caloriesConsumed = document.querySelector('.calories-consumed');
-const caloriesGoalDisplay = document.querySelector('.calories-goal');
-const progressFill = document.querySelector('.progress-fill');
-const remainingDisplay = document.getElementById('remaining');
+// Weekly data (last 7 days + today)
+let weeklyData = [
+    { day: 'We', calories: 1750, goal: 1900 },
+    { day: 'Th', calories: 1820, goal: 1900 },
+    { day: 'Fr', calories: 2100, goal: 1900 },
+    { day: 'Sa', calories: 2250, goal: 1900 },
+    { day: 'Su', calories: 1650, goal: 1900 },
+    { day: 'Mo', calories: 1780, goal: 1900 },
+    { day: 'Tu', calories: 1890, goal: 1900 },
+    { day: 'We', calories: 0, goal: 1900 }  // Today
+];
 
 // Initialize app
 function init() {
     loadFromLocalStorage();
-    updateDisplay();
-    attachEventListeners();
+    updateAllDisplays();
+    renderWeeklyChart();
 }
 
-// Event listeners
-function attachEventListeners() {
-    setGoalBtn.addEventListener('click', setGoal);
-    addFoodBtn.addEventListener('click', addFood);
-    clearAllBtn.addEventListener('click', clearAll);
+// Update all displays
+function updateAllDisplays() {
+    updateBudgetDisplay();
+    updateMealDisplays();
+    updateMetricsDisplay();
+    updateProgressRing();
+    updateAnalysis();
+    renderWeeklyChart();
+}
+
+// Update budget display
+function updateBudgetDisplay() {
+    document.getElementById('budget-display').textContent = calorieGoal.toLocaleString();
+    document.getElementById('calories-consumed').textContent = totalCalories.toLocaleString();
     
-    // Allow Enter key to add food
-    foodNameInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addFood();
-    });
-    foodCaloriesInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addFood();
-    });
+    const remaining = calorieGoal - totalCalories;
+    document.getElementById('calories-left').textContent = Math.abs(remaining).toLocaleString();
 }
 
-// Set calorie goal
-function setGoal() {
-    const newGoal = parseInt(calorieGoalInput.value);
-    if (newGoal && newGoal > 0) {
-        calorieGoal = newGoal;
-        calorieGoalInput.value = '';
-        saveToLocalStorage();
-        updateDisplay();
+// Update meal displays
+function updateMealDisplays() {
+    document.getElementById('breakfast-value').textContent = mealData.breakfast;
+    document.getElementById('lunch-value').textContent = mealData.lunch;
+    document.getElementById('dinner-value').textContent = mealData.dinner;
+    document.getElementById('snacks-value').textContent = mealData.snacks;
+}
+
+// Update metrics display
+function updateMetricsDisplay() {
+    document.getElementById('exercise-value').textContent = exerciseCalories;
+    document.getElementById('steps-value').textContent = formatSteps(steps);
+    document.getElementById('water-value').textContent = water;
+}
+
+// Format steps (8000 -> 8k)
+function formatSteps(num) {
+    if (num >= 1000) {
+        return Math.floor(num / 1000) + 'k';
+    }
+    return num;
+}
+
+// Update Apple Progress Ring
+function updateProgressRing() {
+    const ring = document.getElementById('progress-ring');
+    const radius = 80;
+    const circumference = 2 * Math.PI * radius;
+    
+    const percentage = Math.min((totalCalories / calorieGoal) * 100, 100);
+    const offset = circumference - (percentage / 100) * circumference;
+    
+    ring.style.strokeDashoffset = offset;
+    
+    // Change color based on status
+    if (totalCalories > calorieGoal) {
+        ring.setAttribute('stroke', '#FF3B30'); // Red if over
+    } else if (totalCalories > calorieGoal * 0.9) {
+        ring.setAttribute('stroke', '#FFCC00'); // Yellow if close
+    } else {
+        ring.setAttribute('stroke', '#4CD964'); // Green if good
     }
 }
 
-// Add food item
-function addFood() {
-    const name = foodNameInput.value.trim();
-    const calories = parseInt(foodCaloriesInput.value);
+// Update Analysis
+function updateAnalysis() {
+    const statusElement = document.getElementById('analysis-status');
+    const remaining = calorieGoal - totalCalories;
+    
+    if (totalCalories === 0) {
+        statusElement.textContent = 'Not Started';
+        statusElement.className = 'analysis-status';
+    } else if (totalCalories <= calorieGoal * 0.95) {
+        statusElement.textContent = 'On Target';
+        statusElement.className = 'analysis-status';
+    } else if (totalCalories <= calorieGoal) {
+        statusElement.textContent = 'Nearly There';
+        statusElement.className = 'analysis-status';
+    } else {
+        statusElement.textContent = 'Over Budget';
+        statusElement.className = 'analysis-status over';
+    }
+}
 
-    if (name && calories && calories >= 0) {
+// Render Weekly Chart
+function renderWeeklyChart() {
+    const container = document.getElementById('weekly-bars');
+    container.innerHTML = '';
+    
+    const maxCalories = Math.max(...weeklyData.map(d => d.calories), calorieGoal);
+    
+    weeklyData.forEach((day, index) => {
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        
+        // Set height based on calories (percentage of container)
+        const height = (day.calories / maxCalories) * 100;
+        bar.style.height = height + '%';
+        
+        // Color based on whether over budget
+        if (day.calories > day.goal) {
+            bar.classList.add('over-budget');
+        }
+        
+        container.appendChild(bar);
+    });
+}
+
+// Modal functions
+function openAddModal() {
+    document.getElementById('addModal').style.display = 'block';
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+    document.getElementById('food-name').value = '';
+    document.getElementById('food-calories').value = '';
+}
+
+function openQuickMetrics() {
+    document.getElementById('metricsModal').style.display = 'block';
+    // Pre-fill current values
+    document.getElementById('exercise-input').value = exerciseCalories;
+    document.getElementById('steps-input').value = steps;
+    document.getElementById('water-input').value = water;
+}
+
+function closeQuickMetrics() {
+    document.getElementById('metricsModal').style.display = 'none';
+}
+
+function openSettings() {
+    document.getElementById('settingsModal').style.display = 'block';
+    document.getElementById('calorie-goal-input').value = calorieGoal;
+}
+
+function closeSettings() {
+    document.getElementById('settingsModal').style.display = 'none';
+}
+
+// Close modals when clicking outside
+window.onclick = function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+}
+
+// Add food
+function addFood() {
+    const mealType = document.getElementById('meal-type').value;
+    const name = document.getElementById('food-name').value.trim();
+    const calories = parseInt(document.getElementById('food-calories').value);
+    
+    if (name && calories && calories > 0) {
         const foodItem = {
             id: Date.now(),
             name: name,
-            calories: calories
+            calories: calories,
+            meal: mealType
         };
         
         foodItems.push(foodItem);
-        foodNameInput.value = '';
-        foodCaloriesInput.value = '';
-        foodNameInput.focus();
+        mealData[mealType] += calories;
+        totalCalories += calories;
+        
+        // Update today's data in weekly chart
+        weeklyData[7].calories = totalCalories;
         
         saveToLocalStorage();
-        updateDisplay();
+        updateAllDisplays();
+        closeAddModal();
     }
 }
 
-// Delete food item
-function deleteFood(id) {
-    foodItems = foodItems.filter(item => item.id !== id);
+// Update metrics
+function updateMetrics() {
+    const exerciseInput = parseInt(document.getElementById('exercise-input').value) || 0;
+    const stepsInput = parseInt(document.getElementById('steps-input').value) || 0;
+    const waterInput = parseInt(document.getElementById('water-input').value) || 0;
+    
+    exerciseCalories = exerciseInput;
+    steps = stepsInput;
+    water = waterInput;
+    
     saveToLocalStorage();
-    updateDisplay();
+    updateAllDisplays();
+    closeQuickMetrics();
 }
 
-// Clear all food items
-function clearAll() {
-    if (foodItems.length > 0 && confirm('Are you sure you want to clear all food items?')) {
-        foodItems = [];
+// Update goal
+function updateGoal() {
+    const newGoal = parseInt(document.getElementById('calorie-goal-input').value);
+    
+    if (newGoal && newGoal > 0) {
+        calorieGoal = newGoal;
+        
+        // Update all weekly data goals
+        weeklyData.forEach(day => day.goal = newGoal);
+        
         saveToLocalStorage();
-        updateDisplay();
+        updateAllDisplays();
+        closeSettings();
     }
 }
 
-// Update display
-function updateDisplay() {
-    const totalCalories = foodItems.reduce((sum, item) => sum + item.calories, 0);
-    const remaining = calorieGoal - totalCalories;
-    const percentage = Math.min((totalCalories / calorieGoal) * 100, 100);
-
-    // Update calories display
-    caloriesConsumed.textContent = totalCalories;
-    caloriesGoalDisplay.textContent = calorieGoal;
-    remainingDisplay.textContent = remaining;
-
-    // Update progress bar
-    progressFill.style.width = `${percentage}%`;
-
-    // Change color if over goal
-    if (totalCalories > calorieGoal) {
-        progressFill.style.background = '#dc3545';
-        remainingDisplay.textContent = `${Math.abs(remaining)} over goal`;
-        remainingDisplay.style.color = '#dc3545';
-    } else {
-        progressFill.style.background = 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)';
-        remainingDisplay.style.color = '#666';
+// Reset today's data
+function resetDay() {
+    if (confirm('Are you sure you want to reset today\'s data?')) {
+        totalCalories = 0;
+        exerciseCalories = 0;
+        steps = 0;
+        water = 0;
+        mealData = {
+            breakfast: 0,
+            lunch: 0,
+            dinner: 0,
+            snacks: 0
+        };
+        foodItems = [];
+        weeklyData[7].calories = 0;
+        
+        saveToLocalStorage();
+        updateAllDisplays();
     }
-
-    // Update food list
-    renderFoodList();
-}
-
-// Render food list
-function renderFoodList() {
-    if (foodItems.length === 0) {
-        foodList.innerHTML = '<li class="empty-state">No food items added yet</li>';
-        return;
-    }
-
-    foodList.innerHTML = foodItems.map(item => `
-        <li>
-            <div class="food-info">
-                <span class="food-name">${item.name}</span>
-                <span class="food-calories">${item.calories} cal</span>
-            </div>
-            <button class="delete-btn" onclick="deleteFood(${item.id})">Delete</button>
-        </li>
-    `).join('');
 }
 
 // Local storage functions
 function saveToLocalStorage() {
     localStorage.setItem('calorieGoal', calorieGoal);
+    localStorage.setItem('totalCalories', totalCalories);
+    localStorage.setItem('exerciseCalories', exerciseCalories);
+    localStorage.setItem('steps', steps);
+    localStorage.setItem('water', water);
+    localStorage.setItem('mealData', JSON.stringify(mealData));
     localStorage.setItem('foodItems', JSON.stringify(foodItems));
+    localStorage.setItem('weeklyData', JSON.stringify(weeklyData));
 }
 
 function loadFromLocalStorage() {
     const savedGoal = localStorage.getItem('calorieGoal');
-    const savedItems = localStorage.getItem('foodItems');
-
-    if (savedGoal) {
-        calorieGoal = parseInt(savedGoal);
-    }
-
-    if (savedItems) {
-        foodItems = JSON.parse(savedItems);
+    const savedTotal = localStorage.getItem('totalCalories');
+    const savedExercise = localStorage.getItem('exerciseCalories');
+    const savedSteps = localStorage.getItem('steps');
+    const savedWater = localStorage.getItem('water');
+    const savedMealData = localStorage.getItem('mealData');
+    const savedFoodItems = localStorage.getItem('foodItems');
+    const savedWeeklyData = localStorage.getItem('weeklyData');
+    
+    if (savedGoal) calorieGoal = parseInt(savedGoal);
+    if (savedTotal) totalCalories = parseInt(savedTotal);
+    if (savedExercise) exerciseCalories = parseInt(savedExercise);
+    if (savedSteps) steps = parseInt(savedSteps);
+    if (savedWater) water = parseInt(savedWater);
+    if (savedMealData) mealData = JSON.parse(savedMealData);
+    if (savedFoodItems) foodItems = JSON.parse(savedFoodItems);
+    if (savedWeeklyData) {
+        weeklyData = JSON.parse(savedWeeklyData);
     }
 }
 
 // Initialize the app when DOM is loaded
-init();
-
+document.addEventListener('DOMContentLoaded', init);
