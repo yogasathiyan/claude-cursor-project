@@ -1,0 +1,13 @@
+{
+  "name": "calorie-tracker",
+  "version": "1.0.0",
+  "description": "A simple calorie tracker web application",
+  "scripts": {
+    "start": "npx http-server -p 8000 -o",
+    "dev": "npx http-server -p 8000 -o"
+  },
+  "keywords": ["calorie", "tracker", "health", "fitness"],
+  "author": "",
+  "license": "MIT"
+}
+

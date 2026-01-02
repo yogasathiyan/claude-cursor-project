@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚡ Calorie Tracker</h1>
+            <p class="subtitle">Track your daily calorie intake</p>
+        </header>
+
+        <div class="goal-section">
+            <label for="calorie-goal">Daily Calorie Goal:</label>
+            <input type="number" id="calorie-goal" placeholder="2000" min="0">
+            <button id="set-goal-btn">Set Goal</button>
+        </div>
+
+        <div class="progress-section">
+            <div class="progress-info">
+                <span class="calories-consumed">0</span> / <span class="calories-goal">2000</span> cal
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="calories-remaining">
+                <span id="remaining">2000</span> calories remaining
+            </div>
+        </div>
+
+        <div class="add-food-section">
+            <h2>Add Food Item</h2>
+            <div class="input-group">
+                <input type="text" id="food-name" placeholder="Food name">
+                <input type="number" id="food-calories" placeholder="Calories" min="0">
+                <button id="add-food-btn">Add</button>
+            </div>
+        </div>
+
+        <div class="food-list-section">
+            <h2>Today's Food Log</h2>
+            <ul id="food-list"></ul>
+            <button id="clear-all-btn" class="clear-btn">Clear All</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
