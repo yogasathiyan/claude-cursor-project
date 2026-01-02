@@ -3,125 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calorie Tracker</title>
+    <title>Calorie Tracker - Dashboard</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Calorie Budget</h1>
-            <div class="budget-amount" id="budget-display">1,900</div>
-        </header>
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <h1>Calorie Tracker Dashboard</h1>
+            <div class="header-right">
+                <div class="budget-info">
+                    <span class="budget-label">Daily Goal</span>
+                    <span class="budget-amount" id="budget-display">1,900</span>
+                </div>
+                <button class="header-btn" onclick="openSettings()">⚙️ Settings</button>
+            </div>
+        </div>
+    </header>
 
-        <div class="main-grid">
-            <!-- Left Column -->
-            <div class="left-column">
-                <div class="metric-card">
-                    <div class="metric-label">Exercise</div>
-                    <div class="metric-value" id="exercise-value">0</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Steps</div>
-                    <div class="metric-value" id="steps-value">0</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Water</div>
-                    <div class="metric-value" id="water-value">0</div>
-                </div>
-                <div class="metric-card notes-card">
-                    <div class="metric-label">Notes</div>
-                    <div class="notes-icon">📝</div>
+    <!-- Main Dashboard Grid -->
+    <div class="dashboard-container">
+        <!-- Left Sidebar -->
+        <aside class="left-sidebar">
+            <div class="sidebar-section">
+                <h2>Meal Breakdown</h2>
+                <div class="meal-cards">
+                    <div class="meal-card-large">
+                        <div class="meal-icon">🌅</div>
+                        <div class="meal-info">
+                            <div class="meal-label">Breakfast</div>
+                            <div class="meal-value" id="breakfast-value">0</div>
+                            <div class="meal-subtext">calories</div>
+                        </div>
+                    </div>
+                    <div class="meal-card-large">
+                        <div class="meal-icon">☀️</div>
+                        <div class="meal-info">
+                            <div class="meal-label">Lunch</div>
+                            <div class="meal-value" id="lunch-value">0</div>
+                            <div class="meal-subtext">calories</div>
+                        </div>
+                    </div>
+                    <div class="meal-card-large">
+                        <div class="meal-icon">🌙</div>
+                        <div class="meal-info">
+                            <div class="meal-label">Dinner</div>
+                            <div class="meal-value" id="dinner-value">0</div>
+                            <div class="meal-subtext">calories</div>
+                        </div>
+                    </div>
+                    <div class="meal-card-large">
+                        <div class="meal-icon">🍿</div>
+                        <div class="meal-info">
+                            <div class="meal-label">Snacks</div>
+                            <div class="meal-value" id="snacks-value">0</div>
+                            <div class="meal-subtext">calories</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Center - Apple Progress Ring -->
-            <div class="center-column">
-                <div class="apple-container">
+            <div class="sidebar-section">
+                <div class="analysis-card">
+                    <div class="analysis-header">
+                        <span class="analysis-icon">🎯</span>
+                        <span class="analysis-title">My Analysis</span>
+                    </div>
+                    <div class="analysis-status-large" id="analysis-status">On Target</div>
+                    <div class="analysis-details" id="analysis-details">
+                        You're doing great! Keep it up.
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Progress Ring Section -->
+            <section class="progress-section-large">
+                <div class="apple-container-large">
                     <svg class="apple-progress" viewBox="0 0 200 200">
-                        <!-- Background circle (apple shape) -->
                         <circle cx="100" cy="100" r="80" fill="none" stroke="#E8E8E8" stroke-width="12"/>
-                        <!-- Progress circle -->
                         <circle id="progress-ring" cx="100" cy="100" r="80" fill="none" 
                                 stroke="#4CD964" stroke-width="12" 
                                 stroke-linecap="round"
                                 transform="rotate(-90 100 100)"
                                 stroke-dasharray="502.4"
                                 stroke-dashoffset="502.4"/>
-                        <!-- Stem indicator -->
                         <path d="M 100 15 Q 105 18 100 25" fill="none" stroke="#FF6B6B" stroke-width="3" stroke-linecap="round"/>
                     </svg>
                     <div class="apple-center">
                         <div class="calories-consumed" id="calories-consumed">0</div>
-                        <div class="calories-left-label">Left</div>
+                        <div class="calories-left-label">Remaining</div>
                         <div class="calories-left" id="calories-left">1,900</div>
                     </div>
                 </div>
+                <div class="progress-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">Consumed</div>
+                        <div class="stat-value" id="stat-consumed">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Goal</div>
+                        <div class="stat-value" id="stat-goal">1,900</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Remaining</div>
+                        <div class="stat-value" id="stat-remaining">1,900</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Weekly Chart Section -->
+            <section class="chart-section-large">
+                <h2>Weekly Progress</h2>
+                <div class="chart-container">
+                    <div class="threshold-line"></div>
+                    <div class="bars-container" id="weekly-bars"></div>
+                </div>
+                <div class="chart-days">
+                    <span>We 17</span><span>Th 18</span><span>Fr 19</span><span>Sa 20</span><span>Su 21</span><span>Mo 22</span><span>Tu 23</span><span>We 24</span>
+                </div>
+            </section>
+
+            <!-- Food Log Section -->
+            <section class="food-log-section">
+                <div class="section-header">
+                    <h2>Today's Food Log</h2>
+                    <button class="add-btn-inline" onclick="openAddModal()">+ Add Food</button>
+                </div>
+                <div class="food-log-container" id="food-log">
+                    <div class="empty-log">
+                        <p>No food items logged yet today.</p>
+                        <p class="empty-subtext">Click "+ Add Food" to get started</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recipe Banner -->
+            <section class="recipe-banner">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800" alt="Healthy Recipe" class="recipe-bg">
+                <div class="recipe-overlay">
+                    <h3>DISCOVER</h3>
+                    <h2>Fast & Easy Recipes</h2>
+                    <p>Healthy meals that fit your calorie goals</p>
+                    <button class="recipe-btn">Browse Recipes →</button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Sidebar -->
+        <aside class="right-sidebar">
+            <div class="sidebar-section">
+                <h2>Quick Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card-desktop">
+                        <div class="metric-icon">🏃</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Exercise</div>
+                            <div class="metric-value-desktop" id="exercise-value">0</div>
+                            <div class="metric-unit">calories</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-desktop">
+                        <div class="metric-icon">👟</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Steps</div>
+                            <div class="metric-value-desktop" id="steps-value">0</div>
+                            <div class="metric-unit">steps</div>
+                        </div>
+                    </div>
+                    <div class="metric-card-desktop">
+                        <div class="metric-icon">💧</div>
+                        <div class="metric-content">
+                            <div class="metric-label">Water</div>
+                            <div class="metric-value-desktop" id="water-value">0</div>
+                            <div class="metric-unit">glasses</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="action-btn" onclick="openQuickMetrics()">⚡ Update Metrics</button>
             </div>
 
-            <!-- Right Column -->
-            <div class="right-column">
-                <div class="metric-card meal-card">
-                    <div class="metric-label">Breakfast</div>
-                    <div class="metric-value" id="breakfast-value">0</div>
-                </div>
-                <div class="metric-card meal-card">
-                    <div class="metric-label">Lunch</div>
-                    <div class="metric-value" id="lunch-value">0</div>
-                </div>
-                <div class="metric-card meal-card">
-                    <div class="metric-label">Dinner</div>
-                    <div class="metric-value" id="dinner-value">0</div>
-                </div>
-                <div class="metric-card meal-card">
-                    <div class="metric-label">Snacks</div>
-                    <div class="metric-value" id="snacks-value">0</div>
+            <div class="sidebar-section">
+                <h2>Quick Actions</h2>
+                <div class="action-buttons">
+                    <button class="action-btn primary" onclick="openAddModal()">
+                        <span class="action-icon">➕</span>
+                        <span>Add Food</span>
+                    </button>
+                    <button class="action-btn secondary" onclick="openQuickMetrics()">
+                        <span class="action-icon">⚡</span>
+                        <span>Quick Metrics</span>
+                    </button>
+                    <button class="action-btn" onclick="resetDay()">
+                        <span class="action-icon">🔄</span>
+                        <span>Reset Today</span>
+                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- Quick Add Section -->
-        <div class="quick-add-section">
-            <button class="quick-add-btn" onclick="openAddModal()">+ Add Food</button>
-            <button class="quick-add-btn secondary" onclick="openQuickMetrics()">⚡ Quick Add</button>
-        </div>
-
-        <!-- Weekly Chart -->
-        <div class="weekly-chart-section">
-            <h2>Weekly Progress</h2>
-            <div class="chart-container">
-                <div class="threshold-line"></div>
-                <div class="bars-container" id="weekly-bars"></div>
+            <div class="sidebar-section notes-section">
+                <h2>Notes</h2>
+                <textarea class="notes-textarea" id="notes-text" placeholder="Add notes about your day..."></textarea>
+                <button class="action-btn" onclick="saveNotes()">💾 Save Notes</button>
             </div>
-            <div class="chart-days">
-                <span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span><span>Mo</span><span>Tu</span><span>We</span>
-            </div>
-        </div>
-
-        <!-- Analysis Section -->
-        <div class="analysis-section">
-            <span class="analysis-icon">🎯</span>
-            <span class="analysis-text">My Analysis: <span class="analysis-status" id="analysis-status">On Target</span></span>
-        </div>
-
-        <!-- Recipe Section -->
-        <div class="recipe-section">
-            <div class="recipe-card">
-                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400" alt="Healthy Recipe" class="recipe-image">
-                <div class="recipe-content">
-                    <h3>FAST & EASY</h3>
-                    <p>RECIPES</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Settings Section -->
-        <div class="settings-section">
-            <button class="settings-btn" onclick="openSettings()">⚙️ Settings</button>
-            <button class="settings-btn" onclick="resetDay()">🔄 Reset Today</button>
-        </div>
+        </aside>
     </div>
 
-    <!-- Add Food Modal -->
+    <!-- Modals (unchanged) -->
     <div id="addModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeAddModal()">&times;</span>
@@ -146,7 +236,6 @@
         </div>
     </div>
 
-    <!-- Quick Metrics Modal -->
     <div id="metricsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeQuickMetrics()">&times;</span>
@@ -166,7 +255,6 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeSettings()">&times;</span>
